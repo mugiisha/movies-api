@@ -13,6 +13,19 @@ export const addUser = async (
   try {
     let { name, email, password } = req.body;
 
+    const existingUser = await UserService.querySingleUser({
+      where: {
+        email,
+      },
+    });
+
+    if (existingUser) {
+      return failureResponse(res, {
+        message: "user already exists",
+        status: 400,
+      });
+    }
+
     const saltNumber = Number(process.env.SALT_NUMBER);
     const hashedPassword = await bcrypt.hash(password, saltNumber);
 
@@ -23,13 +36,24 @@ export const addUser = async (
     });
 
     if (!user) {
-      return failureResponse(res,{message: 'creating user failed',status:403});
+      return failureResponse(res, {
+        message: "creating user failed",
+        status: 403,
+      });
     }
 
- return successResponse(res,{message: 'user created successfully',status:201,data:user});
+    return successResponse(res, {
+      message: "user created successfully",
+      status: 201,
+      data: user,
+    });
   } catch (error) {
     console.log(error);
-    return failureResponse(res,{message: 'server error',status:500,error});
+    return failureResponse(res, {
+      message: "server error",
+      status: 500,
+      error,
+    });
   }
 };
 
@@ -43,20 +67,23 @@ export const login = async (
     const user = await UserService.querySingleUser({ where: { email } });
 
     if (!user) {
-      return failureResponse(res,{message: 'user not found',status:404});
+      return failureResponse(res, { message: "user not found", status: 404 });
     }
 
     var passwordIsValid = await bcrypt.compare(password, user.password);
 
     if (!passwordIsValid) {
-      return failureResponse(res, { message: "invalid credentials", status: 400 });
+      return failureResponse(res, {
+        message: "invalid credentials",
+        status: 400,
+      });
     }
 
     const token = await assignToken(user);
 
     return successResponse(res, {
       message: `user ${user.name} logged in successfully`,
-      data: {token,user:user.name}
+      data: { token, user: user.name },
     });
   } catch (error) {
     console.log(error);

@@ -6,8 +6,8 @@ const movieListRouter = Router();
 movieListRouter.use(verifyToken);
 
 movieListRouter.get("/:listId", getListMovies);
-movieListRouter.post("/:listId/:movieid", addMovie);
-movieListRouter.patch("/:listId/:movieid", updateRank);
-movieListRouter.delete("/:listId/:movieid", removeMovie);
+movieListRouter.post("/:listId/:movieId", addMovie);
+movieListRouter.patch("/:listId/:movieId", updateRank);
+movieListRouter.delete("/:listId/:movieId", removeMovie);
 
 export default movieListRouter;
