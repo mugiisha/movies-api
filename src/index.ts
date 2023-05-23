@@ -1,7 +1,7 @@
 import express from "express";
 import { db } from "./api/v1/database/models";
 import "dotenv/config";
-// import router from "./api/routes";
+import router from "./api/v1/routes";
 
 const app = express();
 
@@ -10,7 +10,7 @@ app.use(express.json());
 
 const port = process.env.PORT || 4000;
 
-// app.use(router);
+app.use('/v1',router);
 
 app.listen(port, () => {
   console.log("Server started on port " + port);
