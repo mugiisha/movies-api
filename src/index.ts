@@ -10,7 +10,12 @@ app.use(express.json());
 
 const port = process.env.PORT || 4000;
 
-app.use('/v1',router);
+app.get("/", (req, res) => {
+  return res.status(200).json({
+    message: "welcome to the movies api",
+  });
+});
+app.use("/v1", router);
 
 app.listen(port, () => {
   console.log("Server started on port " + port);
