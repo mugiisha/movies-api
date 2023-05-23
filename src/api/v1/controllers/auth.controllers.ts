@@ -3,6 +3,7 @@ import UserService from "../services/users.services";
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import "dotenv/config";
+import { failureResponse, successResponse } from "../utils/apiResponse";
 
 export const addUser = async (
   req: Request,
@@ -22,13 +23,13 @@ export const addUser = async (
     });
 
     if (!user) {
-      return res.status(403).json({ message: "creating user failed" });
+      return failureResponse(res,{message: 'creating user failed',status:403});
     }
 
-    return res.status(200).json({ message: "user added successfully", user });
+ return successResponse(res,{message: 'user created successfully',status:201,data:user});
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "server error", error });
+    return failureResponse(res,{message: 'server error',status:500,error});
   }
 };
 
@@ -42,24 +43,27 @@ export const login = async (
     const user = await UserService.querySingleUser({ where: { email } });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return failureResponse(res,{message: 'user not found',status:404});
     }
 
     var passwordIsValid = await bcrypt.compare(password, user.password);
 
     if (!passwordIsValid) {
-      return res.status(401).json({ message: "invalid credentials" });
+      return failureResponse(res, { message: "invalid credentials", status: 400 });
     }
 
     const token = await assignToken(user);
 
-    return res.status(200).json({
+    return successResponse(res, {
       message: `user ${user.name} logged in successfully`,
-      token,
-      user: user.name,
+      data: {token,user:user.name}
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "server error", error });
+    return failureResponse(res, {
+      message: "server error",
+      status: 500,
+      error,
+    });
   }
 };

@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import User from "../database/models/user";
 import UserService from "../services/users.services";
 import { Request, Response, NextFunction } from "express";
+import { failureResponse, successResponse } from "../utils/apiResponse";
 
 declare global {
   namespace Express {
@@ -20,15 +21,24 @@ export const getAllUsers = async (
     const users = await UserService.getAll();
 
     if (!users) {
-      return res.status(404).json({ message: "users not found" });
+      return failureResponse(res, {
+        message: "users not found",
+        status: 404,
+      });
     }
 
-    return res
-      .status(200)
-      .json({ message: "user retrieved successfully", users });
+    return successResponse(res, {
+      message: "users retrieved successfully",
+      status: 200,
+      data: users,
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "server error", error });
+    return failureResponse(res, {
+      message: "server error",
+      status: 500,
+      error,
+    });
   }
 };
 
@@ -43,14 +53,20 @@ export const getSingleUser = async (
     const user = await UserService.getSingleUser(+userId);
 
     if (!user) {
-      return res.status(404).json({ message: `user not found` });
+      return failureResponse(res, { message: "user not found" });
     }
-    return res
-      .status(200)
-      .json({ message: "user retrieved successfully", user });
+
+    return successResponse(res, {
+      message: "user retrieved successfully",
+      data: user,
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "server error", error });
+    return failureResponse(res, {
+      message: "server error",
+      status: 500,
+      error,
+    });
   }
 };
 
@@ -67,7 +83,7 @@ export const deleteUser = async (
     if (!user) {
       return res.status(404).json({ message: `user not found` });
     }
-    
+
     await UserService.deleteUser(userId);
     return res.status(200).json({ message: "user deleted successfully" });
   } catch (error) {

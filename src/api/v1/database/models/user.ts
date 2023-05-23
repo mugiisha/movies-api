@@ -8,6 +8,7 @@ import {
   BelongsToCreateAssociationMixin,
 } from "sequelize";
 import { sequelize } from ".";
+import List from "./List";
 
 
 
@@ -16,13 +17,9 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   name!: string;
   email!: string;
   password!: string;
+  getLists!: BelongsToGetAssociationMixin<List>;
 }
 
-// User.belongsTo(User, {foreignKey: 'userId'}); // this works too
-// this configures the `userId` attribute.
-// User.belongsTo(User);
-
-// therefore, `userId` doesn't need to be specified here.
 User.init(
   {
     id: {
@@ -48,3 +45,11 @@ User.init(
 );
 
 export default User;
+
+User.hasMany(List, {
+  foreignKey: "userId",
+})
+
+List.belongsTo(User, {
+  foreignKey: "userId",
+})
