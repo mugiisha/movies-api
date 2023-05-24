@@ -1,6 +1,7 @@
 import MovieListService from "../services/movieList.services";
 import { Request, Response, NextFunction } from "express";
 import { failureResponse, successResponse } from "../utils/apiResponse";
+import ListsServices from "../services/lists.services";
 
 export const getListMovies = async (
   req: Request,
@@ -9,6 +10,12 @@ export const getListMovies = async (
 ) => {
   try {
     const { listId } = req.params;
+
+    const list = await ListsServices.getSingleList(+listId)
+
+    if(!list){
+      return failureResponse(res,{message: 'list could not be found', status:404,})
+    }
 
     const listmovies = await MovieListService.getListMovies(+listId);
 
